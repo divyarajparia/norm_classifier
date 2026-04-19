@@ -20,7 +20,7 @@ norm_classifier_bert/
 
 # Generated data (CSVs, logs, plots)
 *.csv
-!generated_pairs.csv
+!generated_pairs_openai.csv
 generation_log.txt
 *.png
 

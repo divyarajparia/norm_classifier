@@ -31,7 +31,7 @@ MODEL_NAME = "gpt-4o-mini"
 BATCH_SIZE = 20  # norms per API call (each produces 2 statements)
 NUM_WORKERS = 5  # parallel API calls
 
-OUTPUT_FILE = "generated_pairs.csv"
+OUTPUT_FILE = "generated_pairs_openai.csv"
 LOG_FILE = "generation_log.txt"
 
 # Thread lock for file writes
