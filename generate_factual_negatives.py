@@ -1,32 +1,41 @@
 """
-Generate paired statements (norm + generic) using Gemini API.
-For each CultureBank norm, Gemini produces:
+Generate paired statements (norm + generic) using OpenAI API.
+For each CultureBank norm, the model produces:
   - A norm statement (label=1): rephrased behavioral expectation
   - A generic statement (label=0): shares keywords, but non-normative
 
-Both from Gemini = same semantic space, same style, same length.
+Both from the same LLM = same semantic space, same style, same length.
 The model must learn the actual norm vs non-norm distinction.
 
 Resumable: saves after every batch to generated_pairs.csv.
 Tracks last completed index in generation_log.txt.
+Parallel: uses 5 concurrent workers for ~5x speedup.
 """
 
 import csv
 import os
 import re
 import time
+import threading
 import pandas as pd
-from google import genai
+from dotenv import load_dotenv
+from openai import OpenAI
 from datasets import load_dataset
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+load_dotenv()
 
 # ── CONFIG ──────────────────────────────────────────────────────────────────
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-MODEL_NAME = "gemini-2.5-flash"
-BATCH_SIZE = 10  # norms per API call (each produces 2 statements)
-RATE_LIMIT_DELAY = 5  # seconds between API calls
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+MODEL_NAME = "gpt-4o-mini"
+BATCH_SIZE = 20  # norms per API call (each produces 2 statements)
+NUM_WORKERS = 5  # parallel API calls
 
-OUTPUT_FILE = "generated_pairs.csv"
+OUTPUT_FILE = "generated_pairs_openai.csv"
 LOG_FILE = "generation_log.txt"
+
+# Thread lock for file writes
+write_lock = threading.Lock()
 
 # ── LABEL FILTERING ─────────────────────────────────────────────────────────
 OTHER_KEYWORDS = [
@@ -53,28 +62,23 @@ def should_remove_label(label):
 
 
 def load_and_filter_norms():
-    """Load CultureBank, filter labels, merge Americans, cap at 800.
-    Returns DataFrame with columns: culture, actor_behavior, context, topic.
-    """
+    """Load CultureBank, filter labels, merge Americans, cap at 800."""
     print("Loading CultureBank...")
     cb = load_dataset("SALT-NLP/CultureBank")
     df_tiktok = cb["tiktok"].to_pandas()
     df_reddit = cb["reddit"].to_pandas()
     df_cb = pd.concat([df_tiktok, df_reddit], ignore_index=True)
 
-    # Filter high agreement + non-empty actor_behavior
     df_cb = df_cb[df_cb["agreement"] >= 0.6]
     df_cb = df_cb[df_cb["actor_behavior"].notna()]
     df_cb = df_cb[df_cb["actor_behavior"].str.strip() != ""]
 
-    # Extract columns we need
     df = pd.DataFrame()
     df["culture"] = df_cb["cultural group"].values
     df["actor_behavior"] = df_cb["actor_behavior"].str.strip().values
     df["context"] = df_cb["context"].fillna("").str.strip().values
     df["topic"] = df_cb["topic"].fillna("").str.strip().values
 
-    # Remove OTHER, RELIGION, count < 10
     vc = df["culture"].value_counts()
     labels_to_remove = set()
     for label, count in vc.items():
@@ -83,11 +87,9 @@ def load_and_filter_norms():
     removed_count = df[df["culture"].isin(labels_to_remove)].shape[0]
     df = df[~df["culture"].isin(labels_to_remove)].reset_index(drop=True)
 
-    # Merge American/Americans/United States -> American
     us_labels = {"American", "Americans", "United States"}
     df.loc[df["culture"].isin(us_labels), "culture"] = "American"
 
-    # Cap American at 800
     american_mask = df["culture"] == "American"
     if american_mask.sum() > 800:
         american_df = df[american_mask].sample(n=800, random_state=42)
@@ -99,10 +101,7 @@ def load_and_filter_norms():
 
 
 def build_prompt(batch_rows):
-    """Build Gemini prompt for a batch of norms.
-    Each row is a dict with: culture, actor_behavior, context, topic.
-    """
-    # Build the input list
+    """Build prompt for a batch of norms."""
     inputs = []
     for i, row in enumerate(batch_rows, 1):
         ctx = f" | Context: {row['context']}" if row['context'] else ""
@@ -110,6 +109,7 @@ def build_prompt(batch_rows):
         inputs.append(f"[{i}] Culture: {row['culture']} | Norm: {row['actor_behavior']}{ctx}{topic}")
 
     input_block = "\n".join(inputs)
+    n = len(batch_rows)
 
     return f"""You are given cultural norms. For each norm, generate exactly TWO statements:
 
@@ -138,23 +138,16 @@ Example:
 {input_block}
 
 Output ONLY in this exact format, nothing else:
-[1] N: ...
-[1] G: ...
-[2] N: ...
-[2] G: ...
-"""
+""" + "\n".join(f"[{i}] N: ...\n[{i}] G: ..." for i in range(1, n + 1))
 
 
 def parse_response(text, batch_size):
-    """Parse Gemini response into (norm, generic) pairs.
-    Returns list of (norm_text, generic_text) tuples.
-    """
+    """Parse response into (norm, generic) pairs."""
     pairs = {}
     for line in text.strip().split("\n"):
         line = line.strip()
         if not line:
             continue
-        # Match [idx] N: text or [idx] G: text
         match = re.match(r"\[(\d+)\]\s*([NG]):\s*(.+)", line)
         if match:
             idx = int(match.group(1))
@@ -164,19 +157,17 @@ def parse_response(text, batch_size):
                 pairs[idx] = {}
             pairs[idx][stmt_type] = stmt_text
 
-    # Build ordered list of complete pairs
     results = []
     for i in range(1, batch_size + 1):
         if i in pairs and "N" in pairs[i] and "G" in pairs[i]:
             results.append((pairs[i]["N"], pairs[i]["G"]))
         else:
-            results.append(None)  # incomplete pair
+            results.append(None)
 
     return results
 
 
 def get_last_completed_index():
-    """Read the last completed index from log file."""
     if not os.path.exists(LOG_FILE):
         return -1
     last = -1
@@ -184,70 +175,45 @@ def get_last_completed_index():
         for line in f:
             line = line.strip()
             if line.startswith("COMPLETED_INDEX="):
-                last = int(line.split("=")[1])
+                last = int(line.split("=")[1].split("|")[0].strip())
     return last
 
 
 def log_progress(index, total, culture, status):
-    """Append progress to log file."""
-    with open(LOG_FILE, "a") as f:
-        f.write(f"COMPLETED_INDEX={index} | {index+1}/{total} | culture={culture} | {status}\n")
+    with write_lock:
+        with open(LOG_FILE, "a") as f:
+            f.write(f"COMPLETED_INDEX={index} | {index+1}/{total} | culture={culture} | {status}\n")
 
 
 def save_pairs(pairs_to_save):
-    """Append pairs to output CSV."""
-    file_exists = os.path.exists(OUTPUT_FILE)
-    with open(OUTPUT_FILE, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["culture", "original_norm", "norm", "generic"])
-        if not file_exists:
-            writer.writeheader()
-        for row in pairs_to_save:
-            writer.writerow(row)
+    with write_lock:
+        file_exists = os.path.exists(OUTPUT_FILE)
+        with open(OUTPUT_FILE, "a", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["culture", "original_norm", "norm", "generic"])
+            if not file_exists:
+                writer.writeheader()
+            for row in pairs_to_save:
+                writer.writerow(row)
 
 
-def main():
-    client = genai.Client(api_key=GEMINI_API_KEY)
+def process_batch(client, batch_rows, batch_start, batch_end, total):
+    """Process a single batch — called by worker threads."""
+    prompt = build_prompt(batch_rows)
 
-    # Load and filter norms
-    df = load_and_filter_norms()
-    total = len(df)
-
-    # Check resume point
-    last_done = get_last_completed_index()
-    start = last_done + 1
-    if start > 0:
-        print(f"\nResuming from index {start} (already completed {start}/{total})")
-    else:
-        # Fresh start — clear output file if exists
-        if os.path.exists(OUTPUT_FILE):
-            os.remove(OUTPUT_FILE)
-        print(f"\nStarting fresh generation for {total} norms")
-
-    print(f"Batch size: {BATCH_SIZE} norms per API call")
-    print(f"Estimated API calls: {(total - start + BATCH_SIZE - 1) // BATCH_SIZE}")
-    print(f"Estimated time: ~{((total - start + BATCH_SIZE - 1) // BATCH_SIZE) * RATE_LIMIT_DELAY // 60} min\n")
-
-    # Process in batches
-    i = start
-    while i < total:
-        batch_end = min(i + BATCH_SIZE, total)
-        batch_df = df.iloc[i:batch_end]
-        batch_rows = batch_df.to_dict("records")
-
-        prompt = build_prompt(batch_rows)
-
+    max_retries = 3
+    for attempt in range(max_retries):
         try:
-            response = client.models.generate_content(
+            response = client.chat.completions.create(
                 model=MODEL_NAME,
-                contents=prompt,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
             )
-            pairs = parse_response(response.text, len(batch_rows))
+            response_text = response.choices[0].message.content
+            pairs = parse_response(response_text, len(batch_rows))
 
-            # Save successful pairs
             pairs_to_save = []
             success = 0
             for j, pair in enumerate(pairs):
-                row_idx = i + j
                 if pair is not None:
                     norm_text, generic_text = pair
                     pairs_to_save.append({
@@ -257,34 +223,72 @@ def main():
                         "generic": generic_text,
                     })
                     success += 1
-                else:
-                    # Log failed parse — will be skipped
-                    print(f"    WARNING: Failed to parse pair for index {row_idx}")
 
             if pairs_to_save:
                 save_pairs(pairs_to_save)
 
-            # Log progress
             log_progress(batch_end - 1, total, batch_rows[-1]["culture"],
                          f"OK {success}/{len(batch_rows)}")
             print(f"  [{batch_end}/{total}] +{success} pairs | {batch_rows[0]['culture']}")
-
-            i = batch_end
+            return success
 
         except Exception as e:
             err = str(e)[:120]
-            print(f"  ERROR at index {i}: {err}")
-            if "429" in err or "RESOURCE_EXHAUSTED" in err:
-                print("  Rate limited — waiting 60s before retry...")
-                time.sleep(60)
-                continue  # retry same batch
+            if "429" in err or "rate_limit" in err.lower():
+                wait = 10 * (attempt + 1)
+                print(f"  Rate limited at {batch_start}, waiting {wait}s (attempt {attempt+1})...")
+                time.sleep(wait)
+                continue
             else:
-                # Skip this batch on other errors
+                print(f"  ERROR at {batch_start}: {err}")
                 log_progress(batch_end - 1, total, batch_rows[-1]["culture"],
                              f"ERROR: {err[:60]}")
-                i = batch_end
+                return 0
 
-        time.sleep(RATE_LIMIT_DELAY)
+    return 0
+
+
+def main():
+    client = OpenAI(api_key=OPENAI_API_KEY)
+
+    df = load_and_filter_norms()
+    total = len(df)
+
+    last_done = get_last_completed_index()
+    start = last_done + 1
+    if start > 0:
+        print(f"\nResuming from index {start} (already completed {start}/{total})")
+    else:
+        if os.path.exists(OUTPUT_FILE):
+            os.remove(OUTPUT_FILE)
+        print(f"\nStarting fresh generation for {total} norms")
+
+    num_calls = (total - start + BATCH_SIZE - 1) // BATCH_SIZE
+    print(f"Batch size: {BATCH_SIZE} | Workers: {NUM_WORKERS} | API calls: {num_calls}")
+    print(f"Estimated time: ~{num_calls * 2 // NUM_WORKERS // 60} min\n")
+
+    # Build all batches
+    batches = []
+    i = start
+    while i < total:
+        batch_end = min(i + BATCH_SIZE, total)
+        batch_df = df.iloc[i:batch_end]
+        batch_rows = batch_df.to_dict("records")
+        batches.append((batch_rows, i, batch_end))
+        i = batch_end
+
+    # Process in parallel
+    total_success = 0
+    with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
+        futures = {}
+        for batch_rows, batch_start, batch_end in batches:
+            future = executor.submit(process_batch, client, batch_rows,
+                                     batch_start, batch_end, total)
+            futures[future] = (batch_start, batch_end)
+
+        for future in as_completed(futures):
+            result = future.result()
+            total_success += result
 
     # Final summary
     if os.path.exists(OUTPUT_FILE):
