@@ -6,106 +6,89 @@ Binary text classifier: **social norm** (label=1) vs **generic statement** (labe
 
 ## Data Generation Approach
 
-For each CultureBank norm, **Gemini generates a paired norm + generic statement**. Both come from the same model, sharing keywords and length, so the classifier must learn actual norm semantics — not style, length, or vocabulary shortcuts.
+For each CultureBank norm, **OpenAI `gpt-4o-mini` generates a paired norm + generic statement**. Both come from the same LLM, sharing keywords and length, so the classifier must learn actual norm semantics — not style, length, or vocabulary shortcuts.
 
 | Label | What | Example |
 |-------|------|---------|
-| 1 (norm) | Behavioral expectation (Gemini-rephrased) | "Germans typically adhere to strict recycling rules, separating household waste into multiple bins." |
-| 0 (generic) | Factual/technical statement (Gemini-generated, shares keywords) | "The process of recycling waste can significantly reduce landfill volume and conserve natural resources." |
+| 1 (norm) | Behavioral expectation (LLM-rephrased) | "Germans typically adhere to strict recycling rules, separating household waste into multiple bins." |
+| 0 (generic) | Factual/technical statement (shares keywords, non-normative) | "The process of recycling waste can significantly reduce landfill volume and conserve natural resources." |
 
-**Columns fed to Gemini**: `actor_behavior`, `cultural group`, `context`, `topic`
+**CultureBank columns fed to the LLM**: `actor_behavior`, `cultural group`, `context`, `topic`
 
 ## Dataset Decisions
 
 - **Source**: [CultureBank](https://huggingface.co/datasets/SALT-NLP/CultureBank) (TikTok + Reddit, agreement >= 0.6)
-- **Labels removed**: OTHER ("people", "non-X", "family", "global"), RELIGION (Muslim, Christian, Jewish, etc.), count < 10
+- **Labels removed**: OTHER ("people", "non-X", "family", "global"), RELIGION (Muslim, Christian, Jewish, etc.), any label with count < 10
 - **Labels kept as-is**: country demonyms, sub-national (Californians, Texans), ethnic (African Americans), continental (European, Asian)
 - **American/Americans**: merged into "American", capped at 800 samples
 - **Scottish/Welsh/English**: kept separate (not merged into UK)
-- **Gemini model**: `gemini-2.5-flash`
+- **LLM**: OpenAI `gpt-4o-mini` (5 parallel workers, batch size 20, ~5 min total)
 - **Split**: 70/15/15 stratified on label
 
-## Pipeline
+## Replicating After Cloning
+
+After cloning, the repo has source code + `generated_pairs.csv` (the LLM-generated data). CultureBank is loaded from HuggingFace at runtime — no manual download needed.
 
 ```bash
-conda activate nlp_env
+# 1. Install dependencies
+conda activate nlp_env          # or: python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# 1. Generate paired statements via Gemini (resumable, logs to generation_log.txt)
-python generate_factual_negatives.py
+# 2. Assemble train/val/test splits from the tracked generated_pairs.csv
+python3 prepare_dataset_v2.py
+#    → produces: train.csv, val.csv, test.csv
 
-# 2. Assemble train/val/test CSVs
-python prepare_dataset_v2.py
+# 3. Train the BERT classifier (3 epochs)
+python3 train_bert.py
+#    → produces: norm_classifier_bert/ (saved model)
 
-# 3. Train BERT classifier (3 epochs)
-python train_bert.py
+# 4. (Optional) Explore the raw CultureBank dataset
+python3 explore_dataset.py
+#    → produces: plot_source_dist.png, plot_topics.png, plot_cultures.png, plot_agreement.png
+```
+
+To **regenerate** `generated_pairs.csv` from scratch (~5 min, resumable):
+```bash
+# Create a .env file with your OpenAI API key
+echo 'OPENAI_API_KEY=sk-your-key-here' > .env
+
+python3 generate_factual_negatives.py
+# Resumable — if interrupted, re-run and it continues from where it stopped.
+# Progress logged to generation_log.txt
 ```
 
 ## Project Structure
 
 ```
 .
-├── generate_factual_negatives.py  # Gemini paired generation (norm + generic)
-├── prepare_dataset_v2.py          # Assemble and split dataset
-├── train_bert.py                  # BERT fine-tuning and evaluation
-├── explore_dataset.py             # EDA with plots
-├── prepare_dataset.py             # v1 pipeline (AG News, kept for reference)
+├── generate_factual_negatives.py  # OpenAI paired generation (norm + generic), parallel
+├── prepare_dataset_v2.py          # Assemble and split dataset from generated_pairs.csv
+├── train_bert.py                  # BERT fine-tuning (3 epochs) and evaluation
+├── explore_dataset.py             # EDA with plots on raw CultureBank
+├── prepare_dataset.py             # v1 pipeline (AG News negatives, kept for reference)
 ├── requirements.txt               # Python dependencies
-├── generated_pairs.csv            # Gemini output: culture, original_norm, norm, generic
-├── generation_log.txt             # Resume log for Gemini generation
-├── train.csv / val.csv / test.csv # Final dataset splits
-├── norm_classifier_bert/          # Saved model (git-ignored)
-└── plot_*.png                     # EDA plots
+├── .env                           # OpenAI API key (git-ignored)
+├── generated_pairs.csv            # LLM output (tracked): culture, original_norm, norm, generic
+├── generation_log.txt             # Resume log (git-ignored)
+├── train.csv / val.csv / test.csv # Final dataset splits (git-ignored, regenerated by prepare_dataset_v2.py)
+├── norm_classifier_bert/          # Saved model (git-ignored, regenerated by train_bert.py)
+└── plot_*.png                     # EDA plots (git-ignored)
 ```
 
 ## What's in `.gitignore`
 
-Only source code, `generated_pairs.csv`, the PDF spec, and `requirements.txt` are tracked. Everything else is generated and git-ignored:
+Only source code (`.py`), `generated_pairs.csv`, the PDF spec, `requirements.txt`, and `README.md` are tracked. Everything else is generated or secret:
 
 | Pattern | What it excludes |
 |---------|-----------------|
+| `.env` | API keys |
 | `norm_classifier_bert/` | Saved BERT model weights (~440 MB) |
-| `*.safetensors`, `*.pt`, `*.pth`, `*.bin` | Other model checkpoint formats |
-| `*.csv` (except `generated_pairs.csv`) | `train.csv`, `val.csv`, `test.csv`, `test_gemini_output.csv` |
-| `generation_log.txt` | Gemini generation resume log |
-| `*.png` | All generated plots (`plot_*.png`) |
-| `__pycache__/`, `*.py[cod]` | Python bytecode |
-| `venv/`, `env/`, `.venv/` | Virtual environments |
-| `.ipynb_checkpoints/` | Jupyter autosaves |
-| `.vscode/`, `.idea/` | IDE settings |
-| `.DS_Store`, `Thumbs.db` | OS junk |
-| `.claude/` | Claude Code settings |
-
-## Replicating after cloning
-
-After cloning, the repo has source code + `generated_pairs.csv` (the Gemini-generated data). CultureBank is loaded from HuggingFace at runtime — no manual download needed. To get the full working project:
-
-```bash
-# 1. Install dependencies
-conda activate nlp_env          # or create a new venv
-pip install -r requirements.txt
-
-# 2. Set your Gemini API key (only needed if re-running generation)
-export GEMINI_API_KEY="your-key-here"
-
-# 3. Assemble train/val/test splits from the tracked generated_pairs.csv
-python prepare_dataset_v2.py
-#    → produces: train.csv, val.csv, test.csv
-
-# 4. Train the BERT classifier (3 epochs)
-python train_bert.py
-#    → produces: norm_classifier_bert/ (saved model)
-
-# 5. (Optional) Explore the dataset and generate plots
-python explore_dataset.py
-#    → produces: plot_source_dist.png, plot_topics.png, plot_cultures.png, plot_agreement.png
-```
-
-To regenerate `generated_pairs.csv` from scratch (~30-40 min, resumable):
-```bash
-export GEMINI_API_KEY="your-key-here"
-python generate_factual_negatives.py
-```
+| `*.csv` (except `generated_pairs.csv`) | train/val/test splits |
+| `generation_log.txt` | Generation resume log |
+| `*.png` | Generated plots |
+| `*.safetensors`, `*.pt`, `*.pth`, `*.bin` | Model checkpoints |
+| `__pycache__/`, `venv/`, `.ipynb_checkpoints/` | Python/Jupyter artifacts |
+| `.vscode/`, `.idea/`, `.DS_Store`, `.claude/` | IDE/OS/tool files |
 
 ## Bonus Task
 
