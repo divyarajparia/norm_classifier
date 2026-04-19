@@ -1,0 +1,22 @@
+# P3: Norm Classifier — Requirements
+# Install with: pip install -r requirements.txt
+
+# Dataset loading
+datasets==2.19.0
+
+# Data manipulation
+pandas==2.2.2
+numpy==1.26.4
+
+# Plotting (used in explore_dataset.py)
+matplotlib==3.8.4
+
+# ML — classical baseline & metrics
+scikit-learn==1.4.2
+
+# ML — BERT fine-tuning
+torch==2.2.2
+transformers==4.40.1
+
+# Factual negative generation
+google-genai>=1.0.0
