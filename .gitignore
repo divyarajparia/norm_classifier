@@ -35,5 +35,8 @@ generation_log.txt
 .DS_Store
 Thumbs.db
 
+# Secrets
+.env
+
 # Claude Code
 .claude/

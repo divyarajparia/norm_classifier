@@ -10,7 +10,7 @@ Requires: generated_pairs.csv (produced by generate_factual_negatives.py)
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-INPUT_FILE = "generated_pairs_openai.csv"
+INPUT_FILE = "generated_pairs.csv"
 
 # ── 1. LOAD GENERATED PAIRS ────────────────────────────────────────────────
 print("Loading generated pairs...")
