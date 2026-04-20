@@ -3,6 +3,7 @@ Run all 4 experiments sequentially using two_level_pipeline_v2.py.
 Each experiment uses a different train CSV but the SAME test CSV (test_culturebank.csv).
 """
 
+import os
 import subprocess
 import sys
 import time
@@ -13,11 +14,11 @@ TEST_CSV = "test_culturebank.csv"
 
 experiments = [
     # Exp 1: CultureBank only (ALREADY DONE — uncomment to rerun)
-    # {
-    #     "name": "Exp 1: CultureBank Only",
-    #     "train_csv": "train_culturebank.csv",
-    #     "output_dir": "results_exp1_culturebank",
-    # },
+    {
+        "name": "Exp 1: CultureBank Only",
+        "train_csv": "train_culturebank.csv",
+        "output_dir": "results_exp1_culturebank",
+    },
 
     # Exp 2: CultureBank + NormAd merged
     {
@@ -55,11 +56,16 @@ for i, exp in enumerate(experiments):
         "--train_csv", exp["train_csv"],
         "--test_csv", TEST_CSV,
         "--output_dir", exp["output_dir"],
-        "--epochs", "1",
+        "--epochs", "4",
         "--batch_size", "8",
+        "--stage2_epochs", "8",
+        "--stage2_batch_size", "64",
+        "--models",
+        "roberta-base",
+        "google/flan-t5-base",
     ]
 
-    result = subprocess.run(cmd)
+    result = subprocess.run(cmd, env={**os.environ, "CUDA_VISIBLE_DEVICES": "6"})
 
     elapsed = time.time() - start
     status = "DONE" if result.returncode == 0 else f"FAILED (exit code {result.returncode})"

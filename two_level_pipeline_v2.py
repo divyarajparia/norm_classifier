@@ -56,6 +56,96 @@ def get_device() -> str:
     return "cpu"
 
 
+# Demonym → country name mapping for culture stripping
+DEMONYM_TO_COUNTRY = {
+    "afghan": "afghanistan", "argentine": "argentina", "australian": "australia",
+    "austrian": "austria", "bangladeshi": "bangladesh", "bosnian": "bosnia",
+    "brazilian": "brazil", "cambodian": "cambodia", "canadian": "canada",
+    "chilean": "chile", "chinese": "china", "colombian": "colombia",
+    "croatian": "croatia", "cypriot": "cyprus", "egyptian": "egypt",
+    "ethiopian": "ethiopia", "fijian": "fiji", "french": "france",
+    "german": "germany", "greek": "greece", "hungarian": "hungary",
+    "indian": "india", "indonesian": "indonesia", "iranian": "iran",
+    "iraqi": "iraq", "irish": "ireland", "israeli": "israel",
+    "italian": "italy", "japanese": "japan", "kenyan": "kenya",
+    "laotian": "laos", "lebanese": "lebanon", "malaysian": "malaysia",
+    "maltese": "malta", "mauritian": "mauritius", "mexican": "mexico",
+    "burmese": "myanmar", "nepalese": "nepal", "dutch": "netherlands",
+    "pakistani": "pakistan", "palestinian": "palestine", "peruvian": "peru",
+    "filipino": "philippines", "polish": "poland", "portuguese": "portugal",
+    "romanian": "romania", "russian": "russia", "samoan": "samoa",
+    "serbian": "serbia", "singaporean": "singapore", "somali": "somalia",
+    "spanish": "spain", "sudanese": "sudan", "swedish": "sweden",
+    "syrian": "syria", "taiwanese": "taiwan", "thai": "thailand",
+    "timorese": "timor-leste", "tongan": "tonga", "turkish": "turkey",
+    "ukrainian": "ukraine", "british": "britain", "american": "america",
+    "venezuelan": "venezuela", "vietnamese": "vietnam", "zimbabwean": "zimbabwe",
+    "korean": "korea", "swiss": "switzerland", "belgian": "belgium",
+    "norwegian": "norway", "danish": "denmark", "finnish": "finland",
+    "czech": "czech republic", "albanian": "albania", "macedonian": "macedonia",
+    "sri lankan": "sri lanka", "south african": "south africa",
+    "south korean": "south korea", "south sudanese": "south sudan",
+    "saudi arabian": "saudi arabia", "new zealander": "new zealand",
+    "hong konger": "hong kong", "papua new guinean": "papua new guinea",
+}
+
+
+def strip_culture_from_text(text: str, culture: str) -> str:
+    """Remove culture/country mentions from norm text for Stage 2.
+
+    Strips the demonym, its plural, and the country name so the model
+    can't use the culture name as a shortcut for classification.
+    """
+    culture_lower = culture.lower().strip()
+
+    # Build list of terms to remove: demonym, plural, country name
+    terms = [culture_lower]
+
+    # Add plural (e.g., "German" → "Germans")
+    if culture_lower.endswith("s"):
+        terms.append(culture_lower)  # already plural
+    elif culture_lower.endswith("sh") or culture_lower.endswith("ch") or culture_lower.endswith("ese"):
+        terms.append(culture_lower)  # no simple plural (British, French, Chinese)
+    else:
+        terms.append(culture_lower + "s")  # Egyptians, Australians, etc.
+
+    # Add country name from mapping
+    country = DEMONYM_TO_COUNTRY.get(culture_lower, "")
+    if country:
+        terms.append(country)
+
+    # Also handle multi-word cultures directly
+    # e.g., "South Korean" → also strip "South Korea"
+    terms = list(set(t for t in terms if t))
+
+    # Sort longest first to avoid partial replacements
+    terms.sort(key=len, reverse=True)
+
+    result = text
+    for term in terms:
+        # Remove "In [term], " at the start
+        result = re.sub(r"(?i)^in\s+" + re.escape(term) + r"\s*,\s*", "", result)
+        # Remove "In [term] " at the start (no comma)
+        result = re.sub(r"(?i)^in\s+" + re.escape(term) + r"\s+", "", result)
+        # Remove "[term] " at the start of sentence
+        result = re.sub(r"(?i)^" + re.escape(term) + r"\s+", "", result)
+        # Remove "in [term]" mid-sentence (with optional comma after)
+        result = re.sub(r"(?i)\s+in\s+" + re.escape(term) + r"\s*,?\s*", " ", result)
+        # Remove standalone mentions mid-sentence
+        result = re.sub(r"(?i)\b" + re.escape(term) + r"\b", "", result)
+
+    # Clean up artifacts: double spaces, leading/trailing spaces, orphaned commas
+    result = re.sub(r"\s+", " ", result).strip()
+    result = re.sub(r"^,\s*", "", result).strip()
+    result = re.sub(r"\s,", ",", result)
+
+    # Capitalize first letter
+    if result:
+        result = result[0].upper() + result[1:]
+
+    return result
+
+
 @dataclass
 class SplitData:
     train_texts: List[str]
@@ -90,7 +180,8 @@ def prepare_normlabel_dataset(
     train_pairs: pd.DataFrame,
     test_pairs: pd.DataFrame,
 ) -> Tuple[SplitData, Dict[str, int], Dict[int, str], pd.DataFrame]:
-    """Build culture classification dataset from pre-split pairs (norm rows only)."""
+    """Build culture classification dataset from pre-split pairs (norm rows only).
+    Strips culture/country names from text so the model can't use them as shortcuts."""
     def pairs_to_norm_rows(df):
         result = pd.DataFrame({
             "text": df["norm"].astype(str).str.strip(),
@@ -98,10 +189,27 @@ def prepare_normlabel_dataset(
         })
         result = result.dropna(subset=["text", "culture"])
         result = result[(result["text"] != "") & (result["culture"] != "")]
+
+        # Strip culture mentions from text
+        result["text"] = result.apply(
+            lambda row: strip_culture_from_text(row["text"], row["culture"]), axis=1
+        )
+        result = result[result["text"] != ""].reset_index(drop=True)
         return result
 
     train_df = pairs_to_norm_rows(train_pairs)
     test_df = pairs_to_norm_rows(test_pairs)
+
+    # Show examples of stripping
+    print("Culture name stripping examples (Stage 2):")
+    for i in range(min(5, len(test_df))):
+        orig = test_pairs.iloc[i]["norm"]
+        stripped = test_df.iloc[i]["text"]
+        culture = test_df.iloc[i]["culture"]
+        if orig != stripped:
+            print(f"  [{culture}] {orig[:70]}...")
+            print(f"       → {stripped[:70]}...")
+            break
 
     # Build label map from ALL cultures seen in train + test
     all_cultures = sorted(set(train_df["culture"].unique()) | set(test_df["culture"].unique()))
@@ -290,8 +398,10 @@ def main():
     parser.add_argument("--test_csv", required=True, help="Path to test pairs CSV (same columns)")
     parser.add_argument("--output_dir", default="two_level_results_v2")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--epochs", type=int, default=4, help="Epochs for Stage 1 (binary)")
+    parser.add_argument("--batch_size", type=int, default=8, help="Batch size for Stage 1")
+    parser.add_argument("--stage2_epochs", type=int, default=8, help="Epochs for Stage 2 (culture classification)")
+    parser.add_argument("--stage2_batch_size", type=int, default=64, help="Batch size for Stage 2")
     parser.add_argument("--max_length", type=int, default=128)
     parser.add_argument(
         "--models",
@@ -419,8 +529,8 @@ def main():
                     test_texts=norm_data.test_texts,
                     test_label_texts=test_lbl_txt,
                     output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage2"),
-                    epochs=args.epochs,
-                    batch_size=args.batch_size,
+                    epochs=args.stage2_epochs,
+                    batch_size=args.stage2_batch_size,
                     max_input_length=args.max_length,
                     max_target_length=16,
                     seed=args.seed,
@@ -435,8 +545,8 @@ def main():
                     train_data=norm_data,
                     output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage2"),
                     num_labels=len(label2id),
-                    epochs=args.epochs,
-                    batch_size=args.batch_size,
+                    epochs=args.stage2_epochs,
+                    batch_size=args.stage2_batch_size,
                     max_length=args.max_length,
                     seed=args.seed,
                 )
@@ -466,8 +576,10 @@ def main():
                 "n_norm_labels": len(label2id),
                 "stage1_status": stage1_status,
                 "stage2_status": stage2_status,
-                "epochs": args.epochs,
-                "batch_size": args.batch_size,
+                "stage1_epochs": args.epochs,
+                "stage1_batch_size": args.batch_size,
+                "stage2_epochs": args.stage2_epochs,
+                "stage2_batch_size": args.stage2_batch_size,
                 "train_csv": args.train_csv,
                 "test_csv": args.test_csv,
             }
