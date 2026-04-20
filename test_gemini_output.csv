@@ -1,0 +1,16 @@
+country,label,text,word_count
+United States,norm,tip as an expression of gratitude and appreciation for good service,11
+Japan,norm,remove their shoes before entering homes,6
+Italy,norm,"drink, offer, and make grappa, a traditional Italian alcoholic beverage",10
+Germany,norm,follow strict recycling rules and separate waste into multiple bins,10
+South Korea,norm,pour drinks for elders using both hands as a sign of respect,12
+United States,fact,"The Declaration of Independence was adopted on July 4, 1776, in Philadelphia.",12
+United States,fact,The United States is the world's third-largest country by land area.,11
+Japan,fact,"Japan is an island nation composed of 6,852 islands.",9
+Japan,fact,Tokyo became Japan's capital city in 1868 during the Meiji Restoration.,11
+Italy,fact,"The Alps form Italy's northern border, featuring Mont Blanc as its highest peak.",13
+Italy,fact,"The Roman Empire, originating in Italy, dominated much of Europe for centuries.",12
+Germany,fact,"The Black Forest, a large forested mountain range, is located in southwest Germany.",13
+Germany,fact,Germany is known for inventing the printing press and the automobile.,11
+South Korea,fact,"Seoul, the capital of South Korea, is one of the world's most populous megacities.",14
+South Korea,fact,"The Korean War lasted from 1950 to 1953, dividing the peninsula.",11

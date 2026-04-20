@@ -1,0 +1,12 @@
+CULTURE=African Americans | OK 1
+CULTURE=Pakistani | OK 1
+CULTURE=Laotian | OK 1
+CULTURE=Bangladeshi | OK 1
+CULTURE=Belgian | OK 2
+CULTURE=Peruvian | OK 2
+CULTURE=Colombian | OK 2
+CULTURE=Midwesterners | OK 4
+CULTURE=Asian Americans | OK 4
+CULTURE=Southerners | OK 4
+CULTURE=North Korean | OK 4
+CULTURE=Singaporeans | OK 5

@@ -18,9 +18,7 @@ env/
 *.safetensors
 norm_classifier_bert/
 
-# Generated data (CSVs, logs, plots)
-*.csv
-!generated_pairs_openai.csv
+# Generated data (logs, plots)
 generation_log.txt
 *.png
 
