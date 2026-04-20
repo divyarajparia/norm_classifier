@@ -14,9 +14,11 @@ matplotlib==3.8.4
 # ML — classical baseline & metrics
 scikit-learn==1.4.2
 
-# ML — BERT fine-tuning
+# ML — transformer fine-tuning
 torch==2.2.2
 transformers==4.40.1
+accelerate>=0.30.1
+sentencepiece>=0.2.0
 
 # Factual negative generation
 openai>=1.0.0
