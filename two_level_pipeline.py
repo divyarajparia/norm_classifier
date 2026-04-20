@@ -454,6 +454,11 @@ def main():
         labelwise_df = pd.concat(labelwise_all_rows, ignore_index=True)
         labelwise_df.to_csv(os.path.join(args.output_dir, "summary_labelwise_all_models.csv"), index=False)
 
+    print("\n=== Accuracy Summary (Test) ===")
+    display_cols = ["model", "binary_test_accuracy", "norm_label_test_accuracy", "stage1_status", "stage2_status"]
+    display_df = summary_df[display_cols].copy()
+    print(display_df.to_string(index=False))
+
     print("\nDone.")
     print(f"Summary saved to: {summary_path}")
 
