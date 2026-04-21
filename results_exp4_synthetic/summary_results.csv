@@ -1,0 +1,3 @@
+model,binary_test_accuracy,norm_label_test_accuracy,norm_top3_accuracy,norm_top5_accuracy,norm_top10_accuracy,binary_train_size,binary_test_size,norm_train_size,norm_test_size,n_norm_labels,stage1_status,stage2_status,stage1_epochs,stage1_batch_size,stage2_epochs,stage2_batch_size,train_csv,test_csv
+roberta-base,0.9938857263335442,0.34555415086388536,0.49810366624525915,0.5806995364517489,0.7024863042562157,34749,4743,17418,2373,183,ok,ok,3,8,8,64,train_merged_synthetic.csv,test_culturebank.csv
+google/flan-t5-base,0.9934640522875817,0.3796881584492204,0.5065318162663296,0.5794353139485883,0.696165191740413,34749,4743,17418,2373,183,ok,ok,3,8,8,64,train_merged_synthetic.csv,test_culturebank.csv

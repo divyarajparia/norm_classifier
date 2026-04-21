@@ -1,0 +1,77 @@
+label_id,label,count,accuracy,model
+1,African American,15,0.4,roberta-large
+2,Albanian,4,0.0,roberta-large
+3,American,244,0.46311475409836067,roberta-large
+4,Arab,6,0.16666666666666666,roberta-large
+5,Argentinian,16,0.5,roberta-large
+6,Asian Americans,8,0.625,roberta-large
+7,Australian,115,0.34782608695652173,roberta-large
+8,Austrian,11,0.18181818181818182,roberta-large
+10,Belgian,15,0.3333333333333333,roberta-large
+12,Brazilian,33,0.15151515151515152,roberta-large
+13,British,174,0.6149425287356322,roberta-large
+14,Bulgarian,9,0.5555555555555556,roberta-large
+17,Canadian,89,0.34831460674157305,roberta-large
+18,Chilean,3,0.0,roberta-large
+19,Chinese,53,0.4339622641509434,roberta-large
+20,Colombian,4,0.0,roberta-large
+21,Croatian,6,0.16666666666666666,roberta-large
+23,Czech,9,0.6666666666666666,roberta-large
+24,Danish,21,0.5238095238095238,roberta-large
+25,Dutch,73,0.5616438356164384,roberta-large
+26,Egyptian,11,0.09090909090909091,roberta-large
+27,Estonian,3,0.3333333333333333,roberta-large
+30,Filipino,54,0.18518518518518517,roberta-large
+31,Finnish,27,0.5185185185185185,roberta-large
+32,French,101,0.3564356435643564,roberta-large
+33,German,184,0.25,roberta-large
+34,Greek,17,0.058823529411764705,roberta-large
+36,Hungarian,12,0.08333333333333333,roberta-large
+37,Icelandic,3,1.0,roberta-large
+38,Indian,41,0.2926829268292683,roberta-large
+39,Indonesian,46,0.2826086956521739,roberta-large
+42,Irish,28,0.17857142857142858,roberta-large
+43,Israeli,7,0.0,roberta-large
+44,Italian,118,0.3135593220338983,roberta-large
+45,Japanese,71,0.38028169014084506,roberta-large
+46,Kenyan,4,0.25,roberta-large
+47,Korean,71,0.30985915492957744,roberta-large
+49,Latin American,10,0.4,roberta-large
+50,Lebanese,3,0.0,roberta-large
+51,Lithuanian,3,0.0,roberta-large
+53,Malaysian,26,0.34615384615384615,roberta-large
+56,Mexican,39,0.20512820512820512,roberta-large
+57,Moroccan,2,0.0,roberta-large
+58,Māori,2,0.5,roberta-large
+59,Native Americans,3,0.3333333333333333,roberta-large
+61,New Zealander,26,0.23076923076923078,roberta-large
+62,Nigerian,13,0.3076923076923077,roberta-large
+63,North Korean,7,0.7142857142857143,roberta-large
+64,Norwegian,32,0.25,roberta-large
+65,Pakistani,3,0.3333333333333333,roberta-large
+67,Panamanian,2,0.5,roberta-large
+69,Peruvian,2,0.0,roberta-large
+70,Polish,20,0.15,roberta-large
+71,Portuguese,15,0.0,roberta-large
+72,Puerto Rican,7,0.2857142857142857,roberta-large
+73,Romanian,11,0.0,roberta-large
+74,Russian,36,0.25,roberta-large
+76,Saudi Arabian,2,0.5,roberta-large
+77,Scottish,24,0.9583333333333334,roberta-large
+78,Serbian,5,0.2,roberta-large
+79,Singaporean,17,0.11764705882352941,roberta-large
+80,Somali,2,0.0,roberta-large
+81,South African,14,0.2857142857142857,roberta-large
+82,South Korean,10,0.4,roberta-large
+84,Spanish,69,0.5072463768115942,roberta-large
+87,Swedish,56,0.7142857142857143,roberta-large
+88,Swiss,15,0.26666666666666666,roberta-large
+90,Taiwanese,4,0.0,roberta-large
+91,Thai,6,0.0,roberta-large
+94,Tunisian,2,0.0,roberta-large
+95,Turkish,13,0.46153846153846156,roberta-large
+96,Ugandan,3,0.6666666666666666,roberta-large
+97,Ukrainian,11,0.2727272727272727,roberta-large
+98,Venezuelan,2,0.0,roberta-large
+99,Vietnamese,12,0.08333333333333333,roberta-large
+100,Welsh,7,0.8571428571428571,roberta-large

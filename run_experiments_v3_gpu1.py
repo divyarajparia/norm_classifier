@@ -1,6 +1,6 @@
 """
-Run all 4 experiments sequentially using two_level_pipeline_v2.py.
-Each experiment uses a different train CSV but the SAME test CSV (test_culturebank.csv).
+Run Exp 3 + Exp 4 (v4, flan-t5 only) on GPU 3.
+Run: PYTHONNOUSERSITE=1 CUDA_VISIBLE_DEVICES=3 python run_experiments_v3_gpu1.py
 """
 
 import os
@@ -14,36 +14,19 @@ PIPELINE = "two_level_pipeline_v2.py"
 TEST_CSV = "test_culturebank.csv"
 
 experiments = [
-    # Exp 1: CultureBank only (ALREADY DONE — uncomment to rerun)
     {
-        "name": "Exp 1: CultureBank Only",
-        "train_csv": "train_culturebank.csv",
-        "output_dir": "results_v4_exp1_culturebank",
-    },
-
-    # Exp 2: CultureBank + NormAd merged
-    {
-        "name": "Exp 2: Merged (CultureBank + NormAd)",
-        "train_csv": "train_merged.csv",
-        "output_dir": "results_v4_exp2_merged",
-    },
-
-    # Exp 3: Merged + simple oversampling (duplicate minority rows)
-    {
-        "name": "Exp 3: Merged + Oversampled",
+        "name": "Exp 3 v3: Merged + Oversampled",
         "train_csv": "train_merged_oversampled.csv",
         "output_dir": "results_v4_exp3_oversampled",
     },
-
-    # Exp 4: Merged + LLM-generated synthetic norms for minorities
     {
-        "name": "Exp 4: Merged + Synthetic",
+        "name": "Exp 4 v3: Merged + Synthetic",
         "train_csv": "train_merged_synthetic.csv",
         "output_dir": "results_v4_exp4_synthetic",
     },
 ]
 
-for i, exp in enumerate(experiments):
+for exp in experiments:
     print(f"\n{'='*80}")
     print(f"  {exp['name']}")
     print(f"  Train: {exp['train_csv']} | Test: {TEST_CSV}")
@@ -68,12 +51,12 @@ for i, exp in enumerate(experiments):
         "google/flan-t5-base",
     ]
 
-    result = subprocess.run(cmd, env={**os.environ, "CUDA_VISIBLE_DEVICES": "6"})
+    result = subprocess.run(cmd)
 
     elapsed = time.time() - start
     status = "DONE" if result.returncode == 0 else f"FAILED (exit code {result.returncode})"
     print(f"\n>>> {exp['name']}: {status} in {elapsed/60:.1f} min")
 
 print("\n" + "="*80)
-print("ALL EXPERIMENTS COMPLETE")
+print("GPU 1 V3 EXPERIMENTS COMPLETE (Exp 3 + 4)")
 print("="*80)

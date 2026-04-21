@@ -1,0 +1,152 @@
+label_id,label,count,accuracy,model
+1,African,5,0.4,google/flan-t5-base
+2,African American,4,0.0,google/flan-t5-base
+3,African Americans,8,0.125,google/flan-t5-base
+4,Albanian,4,0.0,google/flan-t5-base
+5,American,160,0.475,google/flan-t5-base
+6,Arab,3,0.0,google/flan-t5-base
+7,Arabs,3,0.3333333333333333,google/flan-t5-base
+8,Argentine,3,0.0,google/flan-t5-base
+9,Argentinian,6,0.16666666666666666,google/flan-t5-base
+10,Argentinians,7,0.2857142857142857,google/flan-t5-base
+11,Asian,13,0.3076923076923077,google/flan-t5-base
+12,Asian Americans,8,0.625,google/flan-t5-base
+13,Asians,4,0.25,google/flan-t5-base
+14,Australian,90,0.26666666666666666,google/flan-t5-base
+15,Australians,25,0.0,google/flan-t5-base
+16,Austrian,7,0.14285714285714285,google/flan-t5-base
+17,Austrians,4,0.0,google/flan-t5-base
+18,Balinese,2,0.0,google/flan-t5-base
+20,Belgian,8,0.0,google/flan-t5-base
+21,Belgians,7,0.14285714285714285,google/flan-t5-base
+22,Black Americans,3,0.3333333333333333,google/flan-t5-base
+24,Brazilian,13,0.23076923076923078,google/flan-t5-base
+25,Brazilians,20,0.5,google/flan-t5-base
+26,British,162,0.7407407407407407,google/flan-t5-base
+27,Bulgarian,6,0.6666666666666666,google/flan-t5-base
+28,Bulgarians,3,0.0,google/flan-t5-base
+30,Californians,12,0.5833333333333334,google/flan-t5-base
+32,Canadian,32,0.15625,google/flan-t5-base
+33,Canadians,43,0.46511627906976744,google/flan-t5-base
+34,Charlotte residents,2,0.5,google/flan-t5-base
+35,Chicagoans,2,1.0,google/flan-t5-base
+37,Chileans,3,0.0,google/flan-t5-base
+38,Chinese,53,0.4528301886792453,google/flan-t5-base
+40,Colombians,4,0.25,google/flan-t5-base
+41,Croatian,6,0.16666666666666666,google/flan-t5-base
+43,Czech,4,0.0,google/flan-t5-base
+44,Czechs,5,0.0,google/flan-t5-base
+45,Danish,21,0.47619047619047616,google/flan-t5-base
+46,Dutch,71,0.49295774647887325,google/flan-t5-base
+47,Egyptian,5,0.0,google/flan-t5-base
+48,Egyptians,6,0.3333333333333333,google/flan-t5-base
+49,English,7,0.2857142857142857,google/flan-t5-base
+50,Estonians,3,0.3333333333333333,google/flan-t5-base
+52,European,50,0.52,google/flan-t5-base
+53,Europeans,42,0.35714285714285715,google/flan-t5-base
+55,Filipino,21,0.047619047619047616,google/flan-t5-base
+56,Filipinos,33,0.45454545454545453,google/flan-t5-base
+57,Finnish,22,0.3181818181818182,google/flan-t5-base
+58,Finns,5,0.2,google/flan-t5-base
+59,Floridians,4,0.5,google/flan-t5-base
+60,French,101,0.44554455445544555,google/flan-t5-base
+61,German,113,0.30973451327433627,google/flan-t5-base
+62,Germans,71,0.5352112676056338,google/flan-t5-base
+63,Greek,13,0.0,google/flan-t5-base
+64,Greeks,4,0.25,google/flan-t5-base
+65,Hawaiians,3,0.6666666666666666,google/flan-t5-base
+66,Hispanic,3,0.0,google/flan-t5-base
+69,Hungarians,12,0.6666666666666666,google/flan-t5-base
+70,Icelandic,3,1.0,google/flan-t5-base
+71,Indian,11,0.18181818181818182,google/flan-t5-base
+72,Indian and Indian American,3,0.6666666666666666,google/flan-t5-base
+73,Indians,25,0.68,google/flan-t5-base
+74,Indonesian,16,0.25,google/flan-t5-base
+75,Indonesians,28,0.35714285714285715,google/flan-t5-base
+78,Irish,28,0.17857142857142858,google/flan-t5-base
+79,Israeli,3,0.0,google/flan-t5-base
+80,Israelis,4,0.75,google/flan-t5-base
+81,Italian,81,0.32098765432098764,google/flan-t5-base
+82,Italian and Italian-American,5,0.4,google/flan-t5-base
+83,Italians,30,0.23333333333333334,google/flan-t5-base
+84,Japanese,71,0.4225352112676056,google/flan-t5-base
+85,Kenyan,4,0.0,google/flan-t5-base
+86,Korean,71,0.19718309859154928,google/flan-t5-base
+88,Latin America,2,0.5,google/flan-t5-base
+89,Latin American,2,0.0,google/flan-t5-base
+90,Latin Americans,6,0.3333333333333333,google/flan-t5-base
+91,Latinos,3,0.0,google/flan-t5-base
+92,Lebanese,3,0.0,google/flan-t5-base
+93,Lithuanians,3,0.0,google/flan-t5-base
+94,Londoners,5,0.2,google/flan-t5-base
+96,Malay,3,0.0,google/flan-t5-base
+97,Malayalees,2,0.5,google/flan-t5-base
+98,Malaysian,5,0.0,google/flan-t5-base
+99,Malaysians,18,0.4444444444444444,google/flan-t5-base
+102,Mexican,23,0.08695652173913043,google/flan-t5-base
+103,Mexican and Mexican American,2,0.5,google/flan-t5-base
+104,Mexicans,14,0.5,google/flan-t5-base
+105,Middle Eastern,3,0.0,google/flan-t5-base
+106,Midwesterners,7,0.14285714285714285,google/flan-t5-base
+107,Minnesotans,4,0.5,google/flan-t5-base
+108,Moroccans,2,0.0,google/flan-t5-base
+109,Māori,2,0.0,google/flan-t5-base
+110,Native Americans,3,0.3333333333333333,google/flan-t5-base
+111,Nederlanders,2,0.5,google/flan-t5-base
+113,New Yorkers,12,0.4166666666666667,google/flan-t5-base
+114,New Zealander,9,0.0,google/flan-t5-base
+115,New Zealanders,17,0.47058823529411764,google/flan-t5-base
+116,Nigerian,10,0.3,google/flan-t5-base
+117,Nigerians,3,0.3333333333333333,google/flan-t5-base
+118,Nordic,3,0.6666666666666666,google/flan-t5-base
+119,North Americans,3,0.0,google/flan-t5-base
+120,North Korean,7,0.7142857142857143,google/flan-t5-base
+121,Norwegian,21,0.047619047619047616,google/flan-t5-base
+122,Norwegians,11,0.36363636363636365,google/flan-t5-base
+123,Oregonians,3,0.0,google/flan-t5-base
+125,Pakistanis,3,0.6666666666666666,google/flan-t5-base
+127,Panamanians,2,0.5,google/flan-t5-base
+130,Peruvians,2,0.0,google/flan-t5-base
+131,Polish,20,0.1,google/flan-t5-base
+132,Portuguese,15,0.2,google/flan-t5-base
+133,Puerto Rican,4,0.0,google/flan-t5-base
+134,Puerto Ricans,3,0.3333333333333333,google/flan-t5-base
+135,Québécois,10,0.2,google/flan-t5-base
+136,Romanian,7,0.0,google/flan-t5-base
+137,Romanians,4,0.5,google/flan-t5-base
+138,Russian,7,0.14285714285714285,google/flan-t5-base
+139,Russians,29,0.41379310344827586,google/flan-t5-base
+141,Saudi Arabian,2,0.5,google/flan-t5-base
+142,Scandinavians,2,0.0,google/flan-t5-base
+143,Scottish,24,0.9166666666666666,google/flan-t5-base
+144,Serbian,5,0.4,google/flan-t5-base
+145,Sicilian,2,0.0,google/flan-t5-base
+146,Singaporean,10,0.0,google/flan-t5-base
+147,Singaporeans,7,0.0,google/flan-t5-base
+148,Somali,2,0.0,google/flan-t5-base
+149,South African,12,0.3333333333333333,google/flan-t5-base
+150,South Africans,2,0.0,google/flan-t5-base
+151,South Korean,10,0.3,google/flan-t5-base
+153,Southern Americans,10,0.4,google/flan-t5-base
+154,Southern Californians,3,0.3333333333333333,google/flan-t5-base
+155,Southerners,7,0.0,google/flan-t5-base
+156,Spaniards,12,0.08333333333333333,google/flan-t5-base
+157,Spanish,57,0.47368421052631576,google/flan-t5-base
+160,Swedes,6,0.5,google/flan-t5-base
+161,Swedish,50,0.68,google/flan-t5-base
+162,Swiss,15,0.13333333333333333,google/flan-t5-base
+164,Taiwanese,4,0.0,google/flan-t5-base
+165,Texans,10,0.2,google/flan-t5-base
+166,Thai,6,0.0,google/flan-t5-base
+169,Torontonians,4,0.75,google/flan-t5-base
+170,Tunisian,2,0.0,google/flan-t5-base
+171,Turkish,11,0.2727272727272727,google/flan-t5-base
+172,Turks,2,0.0,google/flan-t5-base
+173,Ugandan,3,0.6666666666666666,google/flan-t5-base
+174,Ukrainian,8,0.0,google/flan-t5-base
+175,Ukrainians,3,0.3333333333333333,google/flan-t5-base
+177,Venezuelans,2,0.0,google/flan-t5-base
+178,Vietnamese,12,0.16666666666666666,google/flan-t5-base
+179,Washingtonians,2,0.0,google/flan-t5-base
+180,Welsh,7,0.8571428571428571,google/flan-t5-base
+181,Westerners,3,0.0,google/flan-t5-base

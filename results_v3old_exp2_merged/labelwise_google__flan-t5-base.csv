@@ -1,0 +1,77 @@
+label_id,label,count,accuracy,model
+1,African American,15,0.26666666666666666,google/flan-t5-base
+2,Albanian,4,0.0,google/flan-t5-base
+3,American,244,0.6475409836065574,google/flan-t5-base
+4,Arab,6,0.0,google/flan-t5-base
+5,Argentinian,16,0.5625,google/flan-t5-base
+6,Asian Americans,8,0.375,google/flan-t5-base
+7,Australian,115,0.3217391304347826,google/flan-t5-base
+8,Austrian,11,0.18181818181818182,google/flan-t5-base
+10,Belgian,15,0.2,google/flan-t5-base
+12,Brazilian,33,0.21212121212121213,google/flan-t5-base
+13,British,174,0.7183908045977011,google/flan-t5-base
+14,Bulgarian,9,0.5555555555555556,google/flan-t5-base
+17,Canadian,89,0.4157303370786517,google/flan-t5-base
+18,Chilean,3,0.0,google/flan-t5-base
+19,Chinese,53,0.41509433962264153,google/flan-t5-base
+20,Colombian,4,0.0,google/flan-t5-base
+21,Croatian,6,0.16666666666666666,google/flan-t5-base
+23,Czech,9,0.5555555555555556,google/flan-t5-base
+24,Danish,21,0.47619047619047616,google/flan-t5-base
+25,Dutch,73,0.547945205479452,google/flan-t5-base
+26,Egyptian,11,0.18181818181818182,google/flan-t5-base
+27,Estonian,3,0.3333333333333333,google/flan-t5-base
+30,Filipino,54,0.2222222222222222,google/flan-t5-base
+31,Finnish,27,0.4074074074074074,google/flan-t5-base
+32,French,101,0.46534653465346537,google/flan-t5-base
+33,German,184,0.358695652173913,google/flan-t5-base
+34,Greek,17,0.058823529411764705,google/flan-t5-base
+36,Hungarian,12,0.08333333333333333,google/flan-t5-base
+37,Icelandic,3,1.0,google/flan-t5-base
+38,Indian,41,0.4146341463414634,google/flan-t5-base
+39,Indonesian,46,0.30434782608695654,google/flan-t5-base
+42,Irish,28,0.10714285714285714,google/flan-t5-base
+43,Israeli,7,0.0,google/flan-t5-base
+44,Italian,118,0.3559322033898305,google/flan-t5-base
+45,Japanese,71,0.39436619718309857,google/flan-t5-base
+46,Kenyan,4,0.25,google/flan-t5-base
+47,Korean,71,0.2676056338028169,google/flan-t5-base
+49,Latin American,10,0.3,google/flan-t5-base
+50,Lebanese,3,0.0,google/flan-t5-base
+51,Lithuanian,3,0.0,google/flan-t5-base
+53,Malaysian,26,0.3076923076923077,google/flan-t5-base
+56,Mexican,39,0.1794871794871795,google/flan-t5-base
+57,Moroccan,2,0.0,google/flan-t5-base
+58,Māori,2,0.0,google/flan-t5-base
+59,Native Americans,3,0.3333333333333333,google/flan-t5-base
+61,New Zealander,26,0.11538461538461539,google/flan-t5-base
+62,Nigerian,13,0.23076923076923078,google/flan-t5-base
+63,North Korean,7,0.7142857142857143,google/flan-t5-base
+64,Norwegian,32,0.15625,google/flan-t5-base
+65,Pakistani,3,0.3333333333333333,google/flan-t5-base
+67,Panamanian,2,0.5,google/flan-t5-base
+69,Peruvian,2,0.0,google/flan-t5-base
+70,Polish,20,0.1,google/flan-t5-base
+71,Portuguese,15,0.3333333333333333,google/flan-t5-base
+72,Puerto Rican,7,0.2857142857142857,google/flan-t5-base
+73,Romanian,11,0.09090909090909091,google/flan-t5-base
+74,Russian,36,0.25,google/flan-t5-base
+76,Saudi Arabian,2,0.5,google/flan-t5-base
+77,Scottish,24,0.9166666666666666,google/flan-t5-base
+78,Serbian,5,0.4,google/flan-t5-base
+79,Singaporean,17,0.058823529411764705,google/flan-t5-base
+80,Somali,2,0.0,google/flan-t5-base
+81,South African,14,0.2857142857142857,google/flan-t5-base
+82,South Korean,10,0.3,google/flan-t5-base
+84,Spanish,69,0.6086956521739131,google/flan-t5-base
+87,Swedish,56,0.7142857142857143,google/flan-t5-base
+88,Swiss,15,0.2,google/flan-t5-base
+90,Taiwanese,4,0.0,google/flan-t5-base
+91,Thai,6,0.0,google/flan-t5-base
+94,Tunisian,2,0.0,google/flan-t5-base
+95,Turkish,13,0.46153846153846156,google/flan-t5-base
+96,Ugandan,3,0.6666666666666666,google/flan-t5-base
+97,Ukrainian,11,0.36363636363636365,google/flan-t5-base
+98,Venezuelan,2,0.0,google/flan-t5-base
+99,Vietnamese,12,0.08333333333333333,google/flan-t5-base
+100,Welsh,7,0.8571428571428571,google/flan-t5-base

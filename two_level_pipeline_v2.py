@@ -89,6 +89,216 @@ DEMONYM_TO_COUNTRY = {
     "hong konger": "hong kong", "papua new guinean": "papua new guinea",
 }
 
+# ── Culture label cleanup ────────────────────────────────────────────────────
+# Merge duplicate / overlapping culture labels to canonical form
+CULTURE_MERGE_MAP = {
+    # Plural → Singular
+    "African Americans": "African American", "Arabs": "Arab",
+    "Argentinians": "Argentinian", "Australians": "Australian",
+    "Austrians": "Austrian", "Belgians": "Belgian",
+    "Brazilians": "Brazilian", "Bulgarians": "Bulgarian",
+    "Canadians": "Canadian", "Czechs": "Czech",
+    "Egyptians": "Egyptian", "Filipinos": "Filipino",
+    "Germans": "German", "Greeks": "Greek",
+    "Indians": "Indian", "Indonesians": "Indonesian",
+    "Israelis": "Israeli", "Italians": "Italian",
+    "Latin Americans": "Latin American", "Malaysians": "Malaysian",
+    "Mexicans": "Mexican", "New Zealanders": "New Zealander",
+    "Nigerians": "Nigerian", "Norwegians": "Norwegian",
+    "Puerto Ricans": "Puerto Rican", "Romanians": "Romanian",
+    "Russians": "Russian", "Singaporeans": "Singaporean",
+    "South Africans": "South African", "Ukrainians": "Ukrainian",
+    "Chileans": "Chilean", "Colombians": "Colombian",
+    "Venezuelans": "Venezuelan", "Peruvians": "Peruvian",
+    "Panamanians": "Panamanian", "Moroccans": "Moroccan",
+    "Pakistanis": "Pakistani", "Hungarians": "Hungarian",
+    "Estonians": "Estonian", "Lithuanians": "Lithuanian",
+    # Synonyms
+    "Argentine": "Argentinian", "Finns": "Finnish",
+    "Swedes": "Swedish", "Turks": "Turkish",
+    "Spaniards": "Spanish", "Nederlanders": "Dutch",
+    "Malay": "Malaysian", "Black Americans": "African American",
+    # Compound → simple
+    "Indian and Indian American": "Indian",
+    "Italian and Italian-American": "Italian",
+    "Mexican and Mexican American": "Mexican",
+    "Latin America": "Latin American",
+    # UK sub-regions → British
+    "English": "British", "Londoners": "British",
+    # Canada sub-regions → Canadian
+    "Torontonians": "Canadian", "Québécois": "Canadian",
+    # US sub-regions → American
+    "Southerners": "American", "Southern Americans": "American",
+    "Midwesterners": "American", "Minnesotans": "American",
+    "Californians": "American", "Southern Californians": "American",
+    "Floridians": "American", "Oregonians": "American",
+    "Texans": "American", "New Yorkers": "American",
+    "Washingtonians": "American", "Chicagoans": "American",
+    "Charlotte residents": "American", "Hawaiians": "American",
+    "North Americans": "American",
+    # Sub-culture → parent
+    "Sicilian": "Italian", "Malayalees": "Indian", "Balinese": "Indonesian",
+}
+
+# Meta-categories too broad to classify — drop from Stage 2
+META_CULTURES_TO_DROP = {
+    "Asian", "Asians", "European", "Europeans", "African",
+    "Middle Eastern", "Nordic", "Scandinavians", "Westerners",
+    "Hispanic", "Latinos",
+}
+
+# ── Region mapping ────────────────────────────────────────────────────────────
+CULTURE_TO_REGION = {
+    # East Asia
+    "Chinese": "East Asia", "Japanese": "East Asia", "Korean": "East Asia",
+    "South Korean": "East Asia", "North Korean": "East Asia", "Taiwanese": "East Asia",
+    "Hong Konger": "East Asia",
+    # Southeast Asia
+    "Filipino": "Southeast Asia", "Indonesian": "Southeast Asia",
+    "Malaysian": "Southeast Asia", "Singaporean": "Southeast Asia",
+    "Thai": "Southeast Asia", "Vietnamese": "Southeast Asia",
+    "Cambodian": "Southeast Asia", "Laotian": "Southeast Asia",
+    "Burmese": "Southeast Asia", "Timorese": "Southeast Asia",
+    # South Asia
+    "Indian": "South Asia", "Pakistani": "South Asia",
+    "Bangladeshi": "South Asia", "Nepalese": "South Asia",
+    "Sri Lankan": "South Asia", "Afghan": "South Asia",
+    # Middle East & North Africa
+    "Arab": "MENA", "Egyptian": "MENA", "Iranian": "MENA",
+    "Iraqi": "MENA", "Israeli": "MENA", "Lebanese": "MENA",
+    "Palestinian": "MENA", "Saudi Arabian": "MENA", "Syrian": "MENA",
+    "Turkish": "MENA", "Tunisian": "MENA", "Moroccan": "MENA",
+    "Jordanian": "MENA", "Kuwaiti": "MENA", "Emirati": "MENA",
+    "Omani": "MENA", "Yemeni": "MENA", "Sudanese": "MENA",
+    # Sub-Saharan Africa
+    "South African": "Sub-Saharan Africa", "Nigerian": "Sub-Saharan Africa",
+    "Kenyan": "Sub-Saharan Africa", "Ethiopian": "Sub-Saharan Africa",
+    "Somali": "Sub-Saharan Africa", "Ugandan": "Sub-Saharan Africa",
+    "Zimbabwean": "Sub-Saharan Africa", "Ghanaian": "Sub-Saharan Africa",
+    "South Sudanese": "Sub-Saharan Africa", "Mauritian": "Sub-Saharan Africa",
+    # Western Europe
+    "British": "Western Europe", "French": "Western Europe",
+    "Dutch": "Western Europe", "Belgian": "Western Europe",
+    "Swiss": "Western Europe", "Irish": "Western Europe",
+    "Scottish": "Western Europe", "Welsh": "Western Europe",
+    "Austrian": "Western Europe", "German": "Western Europe",
+    # Eastern Europe
+    "Russian": "Eastern Europe", "Polish": "Eastern Europe",
+    "Romanian": "Eastern Europe", "Ukrainian": "Eastern Europe",
+    "Czech": "Eastern Europe", "Bulgarian": "Eastern Europe",
+    "Hungarian": "Eastern Europe", "Estonian": "Eastern Europe",
+    "Lithuanian": "Eastern Europe", "Albanian": "Eastern Europe",
+    "Serbian": "Eastern Europe", "Croatian": "Eastern Europe",
+    "Bosnian": "Eastern Europe", "Macedonian": "Eastern Europe",
+    # Northern Europe
+    "Swedish": "Northern Europe", "Norwegian": "Northern Europe",
+    "Danish": "Northern Europe", "Finnish": "Northern Europe",
+    "Icelandic": "Northern Europe",
+    # Southern Europe
+    "Italian": "Southern Europe", "Spanish": "Southern Europe",
+    "Portuguese": "Southern Europe", "Greek": "Southern Europe",
+    "Maltese": "Southern Europe", "Cypriot": "Southern Europe",
+    # North America
+    "American": "North America", "Canadian": "North America",
+    "African American": "North America", "Asian Americans": "North America",
+    "Native Americans": "North America", "Puerto Rican": "North America",
+    # Latin America
+    "Mexican": "Latin America", "Brazilian": "Latin America",
+    "Argentinian": "Latin America", "Colombian": "Latin America",
+    "Chilean": "Latin America", "Venezuelan": "Latin America",
+    "Peruvian": "Latin America", "Panamanian": "Latin America",
+    "Cuban": "Latin America", "Latin American": "Latin America",
+    # Oceania
+    "Australian": "Oceania", "New Zealander": "Oceania",
+    "Fijian": "Oceania", "Samoan": "Oceania", "Tongan": "Oceania",
+    "Māori": "Oceania", "Papua New Guinean": "Oceania",
+}
+
+
+def apply_culture_merging(df: pd.DataFrame) -> pd.DataFrame:
+    """Merge duplicate culture labels and drop meta-categories."""
+    df = df.copy()
+    df["culture"] = df["culture"].map(lambda c: CULTURE_MERGE_MAP.get(c, c))
+    before = len(df)
+    df = df[~df["culture"].isin(META_CULTURES_TO_DROP)].reset_index(drop=True)
+    dropped = before - len(df)
+    if dropped > 0:
+        print(f"  Dropped {dropped} rows with meta-culture labels")
+    return df
+
+
+def compute_region_accuracy(
+    pred_ids: List[int], gold_ids: List[int], id2label: Dict[int, str],
+) -> Dict[str, float]:
+    """Compute region-level accuracy by mapping predicted/gold cultures to regions."""
+    correct = 0
+    total = 0
+    for p, g in zip(pred_ids, gold_ids):
+        g_culture = id2label.get(g, "")
+        p_culture = id2label.get(p, "")
+        g_region = CULTURE_TO_REGION.get(g_culture, "Unknown")
+        p_region = CULTURE_TO_REGION.get(p_culture, "Unknown")
+        if g_region != "Unknown":
+            total += 1
+            if p_region == g_region:
+                correct += 1
+    return {"region_acc": correct / total if total > 0 else 0.0, "region_total": total}
+
+
+def compute_region_topk_from_logits(
+    logits: np.ndarray, gold_ids: np.ndarray, id2label: Dict[int, str],
+    k_values: List[int] = [3, 5],
+) -> Dict[str, float]:
+    """Compute region-level top-k accuracy by summing logits per region."""
+    # Build culture_id → region mapping
+    regions = sorted(set(CULTURE_TO_REGION.values()))
+    region2id = {r: i for i, r in enumerate(regions)}
+    n_regions = len(regions)
+    n_samples = logits.shape[0]
+    n_classes = logits.shape[1]
+
+    # Sum logits per region
+    region_logits = np.full((n_samples, n_regions), -1e9)
+    for cid in range(n_classes):
+        culture = id2label.get(cid, "")
+        region = CULTURE_TO_REGION.get(culture, None)
+        if region and region in region2id:
+            rid = region2id[region]
+            region_logits[:, rid] = np.logaddexp(region_logits[:, rid], logits[:, cid])
+
+    # Map gold to region ids
+    gold_region_ids = []
+    valid_mask = []
+    for g in gold_ids:
+        culture = id2label.get(int(g), "")
+        region = CULTURE_TO_REGION.get(culture, None)
+        if region and region in region2id:
+            gold_region_ids.append(region2id[region])
+            valid_mask.append(True)
+        else:
+            gold_region_ids.append(-1)
+            valid_mask.append(False)
+
+    gold_region_ids = np.array(gold_region_ids)
+    valid_mask = np.array(valid_mask)
+
+    results = {}
+    valid_logits = region_logits[valid_mask]
+    valid_gold = gold_region_ids[valid_mask]
+    n = len(valid_gold)
+
+    # Top-1 region
+    region_preds = np.argmax(valid_logits, axis=1)
+    results["region_top1_acc"] = float((region_preds == valid_gold).mean()) if n > 0 else 0.0
+
+    for k in k_values:
+        actual_k = min(k, n_regions)
+        top_k = np.argsort(valid_logits, axis=1)[:, -actual_k:]
+        correct = sum(1 for i in range(n) if valid_gold[i] in top_k[i])
+        results[f"region_top{k}_acc"] = correct / n if n > 0 else 0.0
+
+    return results
+
 
 def strip_culture_from_text(text: str, culture: str) -> str:
     """Remove culture/country mentions from norm text for Stage 2.
@@ -249,6 +459,25 @@ def build_cls_dataset(texts: List[str], labels: List[int]) -> Dataset:
     return Dataset.from_dict({"text": texts, "label": labels})
 
 
+class WeightedTrainer(Trainer):
+    """Trainer with weighted cross-entropy loss for imbalanced classification."""
+
+    def __init__(self, class_weights=None, **kwargs):
+        super().__init__(**kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        if self.class_weights is not None:
+            weight = self.class_weights.to(logits.device)
+            loss = torch.nn.functional.cross_entropy(logits, labels, weight=weight)
+        else:
+            loss = torch.nn.functional.cross_entropy(logits, labels)
+        return (loss, outputs) if return_outputs else loss
+
+
 def train_eval_encoder(
     model_name: str,
     train_data: SplitData,
@@ -258,7 +487,10 @@ def train_eval_encoder(
     batch_size: int,
     max_length: int,
     seed: int,
-) -> Tuple[np.ndarray, np.ndarray]:
+    learning_rate: float = 2e-5,
+    gradient_accumulation_steps: int = 1,
+    class_weights: torch.Tensor = None,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     train_ds = build_cls_dataset(train_data.train_texts, train_data.train_labels)
@@ -274,32 +506,36 @@ def train_eval_encoder(
 
     args = TrainingArguments(
         output_dir=output_dir,
-        learning_rate=2e-5,
+        learning_rate=learning_rate,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=epochs,
         weight_decay=0.01,
-        evaluation_strategy="no",
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        eval_strategy="no",
         save_strategy="no",
         logging_steps=50,
         report_to=[],
         seed=seed,
     )
 
-    trainer = Trainer(
+    TrainerCls = WeightedTrainer if class_weights is not None else Trainer
+    trainer = TrainerCls(
         model=model,
         args=args,
         train_dataset=train_ds,
         eval_dataset=test_ds,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         data_collator=DataCollatorWithPadding(tokenizer=tokenizer),
+        **({"class_weights": class_weights} if class_weights is not None else {}),
     )
 
     trainer.train()
     pred_out = trainer.predict(test_ds)
-    preds = np.argmax(pred_out.predictions, axis=1)
+    logits = pred_out.predictions
+    preds = np.argmax(logits, axis=1)
     labels = np.array(train_data.test_labels)
-    return preds, labels
+    return preds, labels, logits
 
 
 def build_t5_dataset(texts: List[str], labels_text: List[str], prefix: str) -> Dataset:
@@ -320,7 +556,9 @@ def train_eval_t5(
     max_target_length: int,
     seed: int,
     prefix: str,
-) -> Tuple[List[str], List[str]]:
+    topk: int = 1,
+    learning_rate: float = 2e-4,
+) -> Tuple[List[str], List[str], List[List[str]]]:
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
@@ -346,12 +584,12 @@ def train_eval_t5(
 
     args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
-        learning_rate=2e-4,
+        learning_rate=learning_rate,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=epochs,
         weight_decay=0.01,
-        evaluation_strategy="no",
+        eval_strategy="no",
         save_strategy="no",
         predict_with_generate=True,
         generation_max_length=max_target_length,
@@ -365,7 +603,7 @@ def train_eval_t5(
         args=args,
         train_dataset=train_ds,
         eval_dataset=test_ds,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model),
     )
 
@@ -373,7 +611,29 @@ def train_eval_t5(
     pred_out = trainer.predict(test_ds)
     pred_text = tokenizer.batch_decode(pred_out.predictions, skip_special_tokens=True)
     pred_text = [p.strip() for p in pred_text]
-    return pred_text, test_label_texts
+
+    # Top-k beam search predictions
+    topk_preds = []
+    if topk > 1:
+        model.eval()
+        device = next(model.parameters()).device
+        raw_test_texts = [f"{prefix} {t}" for t in test_texts]
+        for i in range(0, len(raw_test_texts), batch_size):
+            batch_txts = raw_test_texts[i:i + batch_size]
+            inputs = tokenizer(batch_txts, return_tensors="pt", padding=True,
+                               truncation=True, max_length=max_input_length).to(device)
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    num_beams=topk,
+                    num_return_sequences=topk,
+                    max_length=max_target_length,
+                )
+            decoded = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+            for j in range(0, len(decoded), topk):
+                topk_preds.append([d.strip() for d in decoded[j:j + topk]])
+
+    return pred_text, test_label_texts, topk_preds
 
 
 def labelwise_accuracy(y_true: List[int], y_pred: List[int], id2label: Dict[int, str]) -> pd.DataFrame:
@@ -386,6 +646,32 @@ def labelwise_accuracy(y_true: List[int], y_pred: List[int], id2label: Dict[int,
         acc = float((y_pred_arr[mask] == y_true_arr[mask]).mean()) if count > 0 else np.nan
         rows.append({"label_id": int(label_id), "label": id2label[int(label_id)], "count": count, "accuracy": acc})
     return pd.DataFrame(rows)
+
+
+def compute_topk_accuracy(logits: np.ndarray, labels: np.ndarray, k_values: List[int] = [3, 5, 10]) -> Dict[str, float]:
+    """Compute top-k accuracy from encoder logits."""
+    results = {}
+    n = len(labels)
+    for k in k_values:
+        actual_k = min(k, logits.shape[1])
+        top_k_preds = np.argsort(logits, axis=1)[:, -actual_k:]
+        correct = sum(1 for i in range(n) if labels[i] in top_k_preds[i])
+        results[f"top{k}_acc"] = correct / n
+    return results
+
+
+def compute_t5_topk_accuracy(topk_preds: List[List[str]], gold_labels: List[str], k_values: List[int] = [3, 5, 10]) -> Dict[str, float]:
+    """Compute top-k accuracy from T5 beam search text predictions."""
+    results = {}
+    n = len(gold_labels)
+    for k in k_values:
+        correct = 0
+        for i in range(n):
+            preds_k = [normalize_label(p) for p in topk_preds[i][:k]]
+            if normalize_label(gold_labels[i]) in preds_k:
+                correct += 1
+        results[f"top{k}_acc"] = correct / n
+    return results
 
 
 def slugify(model_name: str) -> str:
@@ -402,6 +688,10 @@ def main():
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for Stage 1")
     parser.add_argument("--stage2_epochs", type=int, default=8, help="Epochs for Stage 2 (culture classification)")
     parser.add_argument("--stage2_batch_size", type=int, default=64, help="Batch size for Stage 2")
+    parser.add_argument("--stage2_lr", type=float, default=2e-5, help="Learning rate for Stage 2 encoder models")
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=1, help="Gradient accumulation steps")
+    parser.add_argument("--weighted_loss", action="store_true", help="Use inverse-frequency weighted CE loss for Stage 2")
+    parser.add_argument("--skip_stage1", action="store_true", help="Skip Stage 1 (binary), only run Stage 2 (culture)")
     parser.add_argument("--max_length", type=int, default=128)
     parser.add_argument(
         "--models",
@@ -439,8 +729,15 @@ def main():
     train_pairs = train_pairs.dropna(subset=["culture", "norm", "generic"]).reset_index(drop=True)
     test_pairs = test_pairs.dropna(subset=["culture", "norm", "generic"]).reset_index(drop=True)
 
-    print(f"Train pairs: {len(train_pairs)} ({train_pairs['culture'].nunique()} cultures)")
-    print(f"Test pairs:  {len(test_pairs)} ({test_pairs['culture'].nunique()} cultures)")
+    print(f"Train pairs (raw): {len(train_pairs)} ({train_pairs['culture'].nunique()} cultures)")
+    print(f"Test pairs (raw):  {len(test_pairs)} ({test_pairs['culture'].nunique()} cultures)")
+
+    # Apply culture merging and drop meta-categories
+    print("Applying culture label merging...")
+    train_pairs = apply_culture_merging(train_pairs)
+    test_pairs = apply_culture_merging(test_pairs)
+    print(f"Train pairs (merged): {len(train_pairs)} ({train_pairs['culture'].nunique()} cultures)")
+    print(f"Test pairs (merged):  {len(test_pairs)} ({test_pairs['culture'].nunique()} cultures)")
 
     binary_data = prepare_binary_dataset(train_pairs, test_pairs)
     norm_data, label2id, id2label, norm_test_df = prepare_normlabel_dataset(train_pairs, test_pairs)
@@ -465,6 +762,15 @@ def main():
     print(f"Binary split: train={len(binary_data.train_texts)} test={len(binary_data.test_texts)}")
     print(f"Norm-label split: train={len(norm_data.train_texts)} test={len(norm_data.test_texts)} labels={len(label2id)}")
 
+    # Compute class weights for weighted loss
+    class_weights = None
+    if args.weighted_loss:
+        counts = np.bincount(norm_data.train_labels, minlength=len(label2id)).astype(np.float32)
+        weights = 1.0 / np.maximum(counts, 1)
+        weights = weights / weights.sum() * len(label2id)  # normalize: mean weight = 1
+        class_weights = torch.tensor(weights, dtype=torch.float32)
+        print(f"Weighted loss enabled: min_weight={weights.min():.2f}, max_weight={weights.max():.2f}")
+
     summary_rows = []
     labelwise_all_rows = []
 
@@ -476,53 +782,59 @@ def main():
 
         binary_acc = np.nan
         norm_acc = np.nan
+        topk_results = {}
+        region_results = {}
         stage1_status = "ok"
         stage2_status = "ok"
 
-        try:
-            if "flan-t5" in model_name.lower() or model_name.lower().startswith("t5"):
-                train_lbl_txt = ["norm" if y == 1 else "fact" for y in binary_data.train_labels]
-                test_lbl_txt = ["norm" if y == 1 else "fact" for y in binary_data.test_labels]
-                pred_txt, gold_txt = train_eval_t5(
-                    model_name=model_name,
-                    train_texts=binary_data.train_texts,
-                    train_label_texts=train_lbl_txt,
-                    test_texts=binary_data.test_texts,
-                    test_label_texts=test_lbl_txt,
-                    output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage1"),
-                    epochs=args.epochs,
-                    batch_size=args.batch_size,
-                    max_input_length=args.max_length,
-                    max_target_length=8,
-                    seed=args.seed,
-                    prefix="classify as norm or fact:",
-                )
-                pred_bin = [1 if normalize_label(p) == "norm" else 0 for p in pred_txt]
-                gold_bin = [1 if g == "norm" else 0 for g in gold_txt]
-                binary_acc = accuracy_score(gold_bin, pred_bin)
-            else:
-                pred, gold = train_eval_encoder(
-                    model_name=model_name,
-                    train_data=binary_data,
-                    output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage1"),
-                    num_labels=2,
-                    epochs=args.epochs,
-                    batch_size=args.batch_size,
-                    max_length=args.max_length,
-                    seed=args.seed,
-                )
-                binary_acc = accuracy_score(gold, pred)
+        if args.skip_stage1:
+            print("Skipping Stage 1 (--skip_stage1 set)")
+            stage1_status = "skipped"
+        else:
+            try:
+                if "flan-t5" in model_name.lower() or model_name.lower().startswith("t5"):
+                    train_lbl_txt = ["norm" if y == 1 else "fact" for y in binary_data.train_labels]
+                    test_lbl_txt = ["norm" if y == 1 else "fact" for y in binary_data.test_labels]
+                    pred_txt, gold_txt, _ = train_eval_t5(
+                        model_name=model_name,
+                        train_texts=binary_data.train_texts,
+                        train_label_texts=train_lbl_txt,
+                        test_texts=binary_data.test_texts,
+                        test_label_texts=test_lbl_txt,
+                        output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage1"),
+                        epochs=args.epochs,
+                        batch_size=args.batch_size,
+                        max_input_length=args.max_length,
+                        max_target_length=8,
+                        seed=args.seed,
+                        prefix="classify as norm or fact:",
+                    )
+                    pred_bin = [1 if normalize_label(p) == "norm" else 0 for p in pred_txt]
+                    gold_bin = [1 if g == "norm" else 0 for g in gold_txt]
+                    binary_acc = accuracy_score(gold_bin, pred_bin)
+                else:
+                    pred, gold, _ = train_eval_encoder(
+                        model_name=model_name,
+                        train_data=binary_data,
+                        output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage1"),
+                        num_labels=2,
+                        epochs=args.epochs,
+                        batch_size=args.batch_size,
+                        max_length=args.max_length,
+                        seed=args.seed,
+                    )
+                    binary_acc = accuracy_score(gold, pred)
 
-            print(f"Stage 1 (Norm vs Fact) accuracy: {binary_acc:.4f}")
-        except Exception as e:
-            stage1_status = f"failed: {e}"
-            print(f"Stage 1 failed for {model_name}: {e}")
+                print(f"Stage 1 (Norm vs Fact) accuracy: {binary_acc:.4f}")
+            except Exception as e:
+                stage1_status = f"failed: {e}"
+                print(f"Stage 1 failed for {model_name}: {e}")
 
         try:
             if "flan-t5" in model_name.lower() or model_name.lower().startswith("t5"):
                 train_lbl_txt = [id2label[y] for y in norm_data.train_labels]
                 test_lbl_txt = [id2label[y] for y in norm_data.test_labels]
-                pred_txt, gold_txt = train_eval_t5(
+                pred_txt, gold_txt, topk_preds = train_eval_t5(
                     model_name=model_name,
                     train_texts=norm_data.train_texts,
                     train_label_texts=train_lbl_txt,
@@ -535,12 +847,15 @@ def main():
                     max_target_length=16,
                     seed=args.seed,
                     prefix="classify norm culture label:",
+                    topk=10,
+                    learning_rate=args.stage2_lr * 10,  # T5 uses higher LR
                 )
                 norm_pred_ids = [label2id.get(p, -1) for p in pred_txt]
                 norm_gold_ids = [label2id[g] for g in gold_txt]
                 norm_acc = accuracy_score(norm_gold_ids, norm_pred_ids)
+                topk_results = compute_t5_topk_accuracy(topk_preds, test_lbl_txt, k_values=[3, 5, 10])
             else:
-                pred, gold = train_eval_encoder(
+                pred, gold, logits = train_eval_encoder(
                     model_name=model_name,
                     train_data=norm_data,
                     output_dir=os.path.join(args.output_dir, f"tmp_{model_slug}_stage2"),
@@ -549,17 +864,46 @@ def main():
                     batch_size=args.stage2_batch_size,
                     max_length=args.max_length,
                     seed=args.seed,
+                    learning_rate=args.stage2_lr,
+                    gradient_accumulation_steps=args.gradient_accumulation_steps,
+                    class_weights=class_weights,
                 )
                 norm_pred_ids = pred.tolist()
                 norm_gold_ids = gold.tolist()
                 norm_acc = accuracy_score(norm_gold_ids, norm_pred_ids)
+                topk_results = compute_topk_accuracy(logits, gold, k_values=[3, 5, 10])
 
             lw = labelwise_accuracy(norm_gold_ids, norm_pred_ids, id2label)
             lw["model"] = model_name
             labelwise_all_rows.append(lw)
             lw.to_csv(os.path.join(args.output_dir, f"labelwise_{model_slug}.csv"), index=False)
 
-            print(f"Stage 2 (Norm label) accuracy: {norm_acc:.4f}")
+            # Region accuracy
+            region_results = compute_region_accuracy(norm_pred_ids, norm_gold_ids, id2label)
+            if "flan-t5" in model_name.lower() or model_name.lower().startswith("t5"):
+                # T5: compute region top-k from beam search predictions
+                if topk_preds:
+                    n = len(test_lbl_txt)
+                    for k in [3, 5]:
+                        correct = 0
+                        total = 0
+                        for i in range(n):
+                            gold_region = CULTURE_TO_REGION.get(test_lbl_txt[i], "Unknown")
+                            if gold_region == "Unknown":
+                                continue
+                            total += 1
+                            pred_regions = [CULTURE_TO_REGION.get(p.strip(), "") for p in topk_preds[i][:k]]
+                            if gold_region in pred_regions:
+                                correct += 1
+                        region_results[f"region_top{k}_acc"] = correct / total if total > 0 else 0.0
+            else:
+                region_topk = compute_region_topk_from_logits(logits, gold, id2label, k_values=[3, 5])
+                region_results.update(region_topk)
+
+            topk_str = "  ".join(f"{k}={v:.4f}" for k, v in sorted(topk_results.items()))
+            region_str = "  ".join(f"{k}={v:.4f}" for k, v in sorted(region_results.items()) if k != "region_total")
+            print(f"Stage 2 (Culture) accuracy: top-1={norm_acc:.4f}  {topk_str}")
+            print(f"Stage 2 (Region)  accuracy: {region_str}")
         except Exception as e:
             stage2_status = f"failed: {e}"
             print(f"Stage 2 failed for {model_name}: {e}")
@@ -569,6 +913,12 @@ def main():
                 "model": model_name,
                 "binary_test_accuracy": binary_acc,
                 "norm_label_test_accuracy": norm_acc,
+                "norm_top3_accuracy": topk_results.get("top3_acc", np.nan),
+                "norm_top5_accuracy": topk_results.get("top5_acc", np.nan),
+                "norm_top10_accuracy": topk_results.get("top10_acc", np.nan),
+                "region_top1_accuracy": region_results.get("region_top1_acc", region_results.get("region_acc", np.nan)),
+                "region_top3_accuracy": region_results.get("region_top3_acc", np.nan),
+                "region_top5_accuracy": region_results.get("region_top5_acc", np.nan),
                 "binary_train_size": len(binary_data.train_texts),
                 "binary_test_size": len(binary_data.test_texts),
                 "norm_train_size": len(norm_data.train_texts),
@@ -594,7 +944,7 @@ def main():
         labelwise_df.to_csv(os.path.join(args.output_dir, "summary_labelwise_all_models.csv"), index=False)
 
     print("\n=== Accuracy Summary (Test) ===")
-    display_cols = ["model", "binary_test_accuracy", "norm_label_test_accuracy", "stage1_status", "stage2_status"]
+    display_cols = ["model", "binary_test_accuracy", "norm_label_test_accuracy", "norm_top5_accuracy", "norm_top10_accuracy", "region_top1_accuracy", "region_top3_accuracy", "stage1_status", "stage2_status"]
     display_df = summary_df[display_cols].copy()
     print(display_df.to_string(index=False))
 
